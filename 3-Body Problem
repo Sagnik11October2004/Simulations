@@ -1,0 +1,30 @@
+from vpython import *
+
+# Define the bodies
+sun = sphere(pos=vector(30,40,50), radius=0.5, color=color.yellow, mass=100, momentum=vector(3,0,0), make_trail=True)
+earth = sphere(pos=vector(-30,40,0), radius=0.5, color=color.blue, mass=100, momentum=vector(0,3,0), make_trail=True)
+moon = sphere(pos=vector(30,-40,0), radius=0.5, color=color.white, mass=100, momentum=vector(0,3,0), make_trail=True)
+
+# Define gravitational constant
+G = 1
+
+# Time step
+dt = 0.01
+
+# Main loop
+while True:
+    rate(100)
+
+    # Calculate forces on each body
+    force_earth = G * sun.mass * earth.mass * norm(sun.pos - earth.pos) / mag(sun.pos - earth.pos)**2+G * moon.mass * earth.mass * norm(moon.pos - earth.pos) / mag(moon.pos - earth.pos)**2
+    force_moon = G * earth.mass * moon.mass * norm(earth.pos - moon.pos) / mag(earth.pos - moon.pos)**2+G * sun.mass * moon.mass * norm(sun.pos - moon.pos) / mag(sun.pos - moon.pos)**2
+    force_sun = -G * sun.mass * earth.mass * norm(sun.pos - earth.pos) / mag(sun.pos - earth.pos)**2+G * moon.mass * sun.mass * norm(moon.pos - sun.pos) / mag(sun.pos - moon.pos)**2
+
+    # Update momentum and position of each body
+    sun.momentum += (force_sun) * dt
+    earth.momentum += (force_earth) * dt
+    moon.momentum += (force_moon) * dt
+
+    sun.pos += sun.momentum / sun.mass * dt
+    earth.pos += earth.momentum / earth.mass * dt
+    moon.pos += moon.momentum / moon.mass * dt
